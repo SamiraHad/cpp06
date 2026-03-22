@@ -6,7 +6,7 @@
 /*   By: hsamira <hsamira@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/15 15:42:35 by hsamira           #+#    #+#             */
-/*   Updated: 2026/03/17 13:36:48 by hsamira          ###   ########.fr       */
+/*   Updated: 2026/03/22 16:21:29 by hsamira          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,22 +20,27 @@
 #include <cmath>
 
 class ScalarConverter
+
 {
-    private:
-        static std::string detectType(const std::string& STR);
-        static void printChar(std::string& string);
-        static void printInt(int nbrInt);
-        static void printFloat(float nbrFloat);
-        static void printDouble(double nbrDouble);
-            
+    private: 
+        ScalarConverter();
+        ScalarConverter( const ScalarConverter& other );
+        ScalarConverter& operator=( const ScalarConverter& other );
+        ~ScalarConverter();
 
     public: // delete car on ne peut pas instancier la classe 
-        ScalarConverter() = delete;
-        ScalarConverter( const ScalarConverter& other ) = delete;
-        ScalarConverter& operator=( const ScalarConverter& other ) = delete;
-    
         static void convert(const std::string&  str);
         
 };
+
+static bool isChar(const std::string& literal);
+static bool isInt(const std::string& literal);
+static bool isFloat(const std::string& literal);
+static bool isDouble(const std::string& literal);
+static std::string detectType(const std::string& str);
+static void printChar(std::string& string);
+static void printInt(int nbrInt);
+static void printFloat(float nbrFloat);
+static void printDouble(double nbrDouble);
 
 #endif
