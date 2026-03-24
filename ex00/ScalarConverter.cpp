@@ -6,13 +6,13 @@
 /*   By: hsamira <hsamira@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/15 15:42:02 by hsamira           #+#    #+#             */
-/*   Updated: 2026/03/23 17:15:39 by hsamira          ###   ########.fr       */
+/*   Updated: 2026/03/24 13:20:11 by hsamira          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ScalarConverter.hpp"
 
-static bool isChar(const std::string &literal) // je verifie si lateral est 'a' format classique ou un seul char non chiffre a, @, ...
+static bool isChar(const std::string &literal) // je verifie si literal est 'a' format classique ou un seul char non chiffre a, @, ...
 {
     if((literal.size() == 3 && literal[0] == '\'' && literal[2] == '\'') //'a'
      || (literal.size() == 1 && !std::isdigit(static_cast<unsigned char>(literal[0])))) //le caractère n’est pas un chiffre
@@ -20,17 +20,17 @@ static bool isChar(const std::string &literal) // je verifie si lateral est 'a' 
     return false;
 }
 
-static bool isPseudoLateral(const std::string& lateral) //je verifie si not a numbre || infini
+static bool isPseudoliteral(const std::string& literal) //je verifie si not a numbre || infini
 {
-    if(lateral == "nan" || lateral == "-inf" || lateral == "+inf" ||
-        lateral == "nanf" || lateral == "-inff" || lateral == "+inff")
+    if(literal == "nan" || literal == "-inf" || literal == "+inf" ||
+        literal == "nanf" || literal == "-inff" || literal == "+inff")
             return true;
     return false;
 }
 
 static bool isInt(const std::string &literal)
 {
-    if(isPseudoLateral(literal) || literal.empty())
+    if(isPseudoliteral(literal) || literal.empty())
         return false;
         
     size_t i = 0;
@@ -48,7 +48,7 @@ static bool isInt(const std::string &literal)
 }
 static bool isFloat(const std::string &literal)
 {
-    if(isPseudoLateral(literal) || literal.empty())
+    if(isPseudoliteral(literal) || literal.empty())
         return false;
     size_t i = 0;
     bool hasDot = false;
@@ -78,7 +78,7 @@ static bool isFloat(const std::string &literal)
 
 static bool isDouble(const std::string &literal)
 {
-    if(isPseudoLateral(literal) || literal.empty())
+    if(isPseudoliteral(literal) || literal.empty())
         return false;
     size_t i = 0;
     bool hasDot = false;
@@ -106,108 +106,107 @@ static bool isDouble(const std::string &literal)
     return true;
 } 
 
-static std::string detectType(const std::string &literal)
+static void printChar(double value)
 {
-    if(isPseudoLateral(literal))
-        return "pseudo";
-    else if(isChar(literal))
-        return "char";
-    else if(isInt(literal))
-        return "int";
-    else if(isFloat(literal))
-        return "float";
-    else if(isDouble(literal))
-        return "double";
-    else
-        return "unknown";
-}
-
-static void printChar(char c)
-{
-    if(c < 0 || c > 127 || std::isnan(c))
+    if(value < 0 || value > 127 || std::isnan(value) || std::isinf(value))
         std::cout << " char: impossible" << std::endl;
-    else if(!std::isprint(static_cast<unsigned char>(c)))
+    else if(!std::isprint(static_cast<char>(value)))
         std::cout << " char: Non displayable" << std::endl;
     else
-        std::cout << " char: '" << c << "'" << std::endl; 
-    std::cout << " int: " << static_cast<int>(c)<< std::endl;
-    std::cout << " float: " << static_cast<float>(c) << "f" << std::endl;
-    std::cout << " double: " << static_cast<double>(c) << std::endl;     
+        std::cout << " char: '" << static_cast<char>(value) << "'" << std::endl;    
 }
 
-static void printInt(int nbrInt)
+static void printInt(double value)
 {
-    if(nbrInt < 0 || nbrInt > 127 || std::isnan(nbrInt) || std::isinf(nbrInt))
-        std::cout << " char: impossible" << std::endl;
-    else if(!isprint(static_cast<unsigned char>(nbrInt)))
-        std::cout << " char: Non displayable" << std::endl;
-    else   
-        std::cout << " char: '" << static_cast<char>(nbrInt) << "'" << std::endl; 
-    std::cout << " int: " << nbrInt << std::endl;
-    std::cout << " float: " << static_cast<float>(nbrInt) << "f" << std::endl;
-    std::cout << " double: " << static_cast<double>(nbrInt) << std::endl;  
-}
-
-static void printFloat(float nbrFloat)
-{
-    if(nbrFloat < 0 || nbrFloat > 127 || std::isnan(nbrFloat) || std::isinf(nbrFloat))
-        std::cout << " char: impossible" << std::endl;
-    else if(!isprint(static_cast<unsigned char>(nbrFloat)))
-        std::cout << " char: Non displayable" << std::endl;
+    if(std::isnan(value) || std::isinf(value) || value < std::numeric_limits<int>::min() || value > std::numeric_limits<int>::max())
+        std::cout << "int: impossible." << std::endl;
     else
-        std::cout << " char: '" << static_cast<char>(nbrFloat) << "'" << std::endl; 
-    std::cout << " int: " << static_cast<int>(nbrFloat) << std::endl;
-    std::cout << " float: " << nbrFloat << "f" << std::endl;
-    std::cout << " double: " << static_cast<double>(nbrFloat) << std::endl;  
+        std::cout << "int: " << static_cast<int>(value) << std::endl;
+}
+
+
+static void printFloat(double value)
+{
+    if( std::isnan(value))
+    {
+        std::cout << "float: nanf" << std::endl;
+        return;
+    }
+
+    if(std::isinf(value))
+    {
+        if(value < 0)
+            std::cout << "float: -inff" << std::endl;
+        else
+            std::cout << "float: +inff" << std::endl;
+        return;
+    }
+    float nbr =  static_cast<float>(value); 
+    if(nbr == static_cast<int>(nbr))
+        std::cout << "float: " << std::fixed << std::setprecision(1) << nbr << "f" << std::endl;  
+    else
+        std::cout << "float: " << nbr << "f" << std::endl;
 }
     
-static void printDouble(double nbrDouble)
+static void printDouble(double value)
 {
-    if(nbrDouble < 0 || nbrDouble > 127 || std::isnan(nbrDouble) || std::isinf(nbrDouble))
-        std::cout << " char: impossible" << std::endl;
-    else if(!isprint(static_cast<unsigned char>(nbrDouble)))
-        std::cout << " char: Non displayable" << std::endl;
-    else    
-        std::cout << " char: '" << static_cast<char>(nbrDouble) << "'" << std::endl; 
-    std::cout << " int: " << static_cast<int>(nbrDouble) << std::endl;
-    std::cout << " float: " << static_cast<float>(nbrDouble) << "f" << std::endl;
-    std::cout << " double: " << nbrDouble << std::endl;  
+    if( std::isnan(value))
+    {
+        std::cout << "double: nan" << std::endl;
+        return;
+    }
+
+    if(std::isinf(value))
+    {
+        if(value < 0)
+            std::cout << "double: -inf" << std::endl;
+        else
+            std::cout << "double: +inf" << std::endl;
+        return;
+    }
+    
+    if(value == static_cast<int>(value))
+        std::cout << "double: " << std::fixed << std::setprecision(1) << value << std::endl;  
+    else
+        std::cout << "double: " << value << std::endl;
 }
 
 void ScalarConverter::convert(const std::string& literal)
 {
-    std::string type = detectType(literal);
-    
-    if(type == "char")
+    double value;
+    if(isChar(literal))
     {
         char c;
         if(literal.size() == 3)
             c = literal[1];
         else
             c = literal[0];
-        printChar(c);
+        value = static_cast<double>(c);
             
     }
-    else if(type == "int") 
-    {
-        int value = static_cast<int>(std::strtod(literal.c_str(), NULL));
-        printInt(value);
-    } 
-    else if(type == "float") 
-    {
-        float value = static_cast<float>(std::strtod(literal.c_str(), NULL));
-        printFloat(value);
-    }  
-    else if(type == "double")
-    {
-        double value = std::strtod(literal.c_str(), NULL);
-        printDouble(value);
-    }
-    else if(type == "pseudo")
-    {
-        double value = std::strtod(literal.c_str(),NULL);
-        printDouble(value);   
-    }
+
+    else if(isPseudoliteral(literal))
+       value = std::strtod(literal.c_str(),NULL); 
+       
+    else if(isInt(literal)) 
+        value = std::strtod(literal.c_str(), NULL);
+        
+    else if(isFloat(literal)) 
+        value = std::strtod(literal.c_str(), NULL);
+        
+    else if(isDouble(literal))
+        value = std::strtod(literal.c_str(), NULL);
+    
     else
-        std::cout << " Error input" << std::endl;
+    {
+        std::cout << "char: impossible" << std::endl;
+        std::cout << "int: impossible" << std::endl;
+        std::cout << "float: impossible" << std::endl;
+        std::cout << "double: impossible" << std::endl;
+        return;
+    }
+    printChar(value);
+    printInt(value);
+    printFloat(value);
+    printDouble(value);
 }
