@@ -6,7 +6,7 @@
 /*   By: hsamira <hsamira@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/15 15:42:02 by hsamira           #+#    #+#             */
-/*   Updated: 2026/03/24 13:20:11 by hsamira          ###   ########.fr       */
+/*   Updated: 2026/03/29 18:08:00 by hsamira          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,26 +106,20 @@ static bool isDouble(const std::string &literal)
     return true;
 } 
 
-static void printChar(double value)
+static void printChar(char value)
 {
-    if(value < 0 || value > 127 || std::isnan(value) || std::isinf(value))
-        std::cout << " char: impossible" << std::endl;
-    else if(!std::isprint(static_cast<char>(value)))
-        std::cout << " char: Non displayable" << std::endl;
+    if(!std::isprint(static_cast<unsigned char>(value)))
+        std::cout << "char: Non displayable" << std::endl;
     else
-        std::cout << " char: '" << static_cast<char>(value) << "'" << std::endl;    
+        std::cout << "char: '" << value << "'" << std::endl;    
 }
 
-static void printInt(double value)
+static void printInt(int value)
 {
-    if(std::isnan(value) || std::isinf(value) || value < std::numeric_limits<int>::min() || value > std::numeric_limits<int>::max())
-        std::cout << "int: impossible." << std::endl;
-    else
-        std::cout << "int: " << static_cast<int>(value) << std::endl;
+    std::cout << "int: " << value << std::endl;
 }
 
-
-static void printFloat(double value)
+static void printFloat(float value)
 {
     if( std::isnan(value))
     {
@@ -141,11 +135,10 @@ static void printFloat(double value)
             std::cout << "float: +inff" << std::endl;
         return;
     }
-    float nbr =  static_cast<float>(value); 
-    if(nbr == static_cast<int>(nbr))
-        std::cout << "float: " << std::fixed << std::setprecision(1) << nbr << "f" << std::endl;  
+    if(value == static_cast<int>(value))
+        std::cout << "float: " << std::fixed << std::setprecision(1) << value << "f" << std::endl;  
     else
-        std::cout << "float: " << nbr << "f" << std::endl;
+        std::cout << "float: " << value << "f" << std::endl;
 }
     
 static void printDouble(double value)
@@ -173,7 +166,6 @@ static void printDouble(double value)
 
 void ScalarConverter::convert(const std::string& literal)
 {
-    double value;
     if(isChar(literal))
     {
         char c;
@@ -181,32 +173,75 @@ void ScalarConverter::convert(const std::string& literal)
             c = literal[1];
         else
             c = literal[0];
-        value = static_cast<double>(c);
-            
+        printChar(c);
+        printInt(static_cast<int>(c));
+        printFloat(static_cast<float>(c));
+        printDouble(static_cast<double>(c)); 
     }
-
-    else if(isPseudoliteral(literal))
-       value = std::strtod(literal.c_str(),NULL); 
        
     else if(isInt(literal)) 
-        value = std::strtod(literal.c_str(), NULL);
+    {
+        long l = std::strtol(literal.c_str(), NULL, 10);// pour gere les limites
+
+        if(l > std::numeric_limits<int>::max() || l < std::numeric_limits<int>::min())
+        
+        {
+            std::cout << "char: impossible" << std::endl;
+            std::cout << "int: impossible" << std::endl;
+            std::cout << "float: impossible" << std::endl;
+            std::cout << "double: impossible" << std::endl;
+            return;
+        } 
+
+        int i = static_cast<int>(l);
+        if(i < 0 || i > 127)
+            std::cout << "char: impossible" << std::endl;
+        else
+            printChar(static_cast<char>(i));
+        printInt(i);
+        printFloat(static_cast<float>(i));
+        printDouble(static_cast<double>(i));
+    }
         
     else if(isFloat(literal)) 
-        value = std::strtod(literal.c_str(), NULL);
+    {
+        double tmp = std::strtod(literal.c_str(), NULL);
+        float f = static_cast<float>(tmp);
         
-    else if(isDouble(literal))
-        value = std::strtod(literal.c_str(), NULL);
-    
+        if(std::isnan(f) || std::isinf(f) || f < 0 || f > 127 )
+            std::cout << "char: impossible" << std::endl;
+        else
+            printChar(static_cast<char>(f));
+        if(std::isnan(f) || std::isinf(f) || f > std::numeric_limits<int>::max() || f < std::numeric_limits<int>::min())
+            std::cout << "int: impossible" << std::endl;
+        else
+            printInt(static_cast<int>(f));
+        printFloat(f);
+        printDouble(static_cast<double>(f));
+    } 
+    else if(isDouble(literal) || isPseudoliteral(literal))
+    {
+        double d = std::strtod(literal.c_str(), NULL); 
+
+        if(std::isnan(d) || std::isinf(d) || d < 0 || d > 127)
+            std::cout << "char: impossible" << std::endl;
+        else
+            printChar(static_cast<char>(d));
+
+        if(std::isnan(d) || std::isinf(d) || d > std::numeric_limits<int>::max() || d < std::numeric_limits<int>::min())
+            std::cout << "int: impossible" << std::endl;
+        else
+            printInt(static_cast<int>(d));
+        printFloat(static_cast<float>(d));
+        printDouble(d);
+    }
     else
     {
         std::cout << "char: impossible" << std::endl;
         std::cout << "int: impossible" << std::endl;
         std::cout << "float: impossible" << std::endl;
         std::cout << "double: impossible" << std::endl;
-        return;
-    }
-    printChar(value);
-    printInt(value);
-    printFloat(value);
-    printDouble(value);
+    } 
 }
+
+
