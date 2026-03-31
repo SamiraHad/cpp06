@@ -18,19 +18,19 @@ int main()
     Data data;
     data.name = "samira";
     data.id = 5;
-    Data* original = &data;
-    uintptr_t raw = Serializer::serialize(original);
+    Data* originalPtr = &data;
+    uintptr_t raw = Serializer::serialize(originalPtr);
     Data* back = Serializer::deserialize(raw);
 
-    std::cout << "original ptr: " << original << std::endl;
+    std::cout << "Adresse originale: " << originalPtr << std::endl;
     std::cout << "raw value: " << raw << std::endl;
-    std::cout << "original name: " << original->name << std::endl;
-    std::cout << "original id: " << original->id << std::endl;
-    std::cout << "back ptr: " << back << std::endl;
+    std::cout << "original name: " << originalPtr->name << std::endl;
+    std::cout << "original id: " << originalPtr->id << std::endl;
+    std::cout << "Adresse interpretee: " << back << std::endl;
     std::cout << "back name: " << back->name << std::endl;
     std::cout << "back id: " << back->id << std::endl;
 
-    if(original == back)
+    if(originalPtr == back)
         std::cout << "original == back" << std::endl;
     else
         std::cout << "original != back" << std::endl;    

@@ -20,7 +20,7 @@ static bool isChar(const std::string &literal) // je verifie si literal est 'a' 
     return false;
 }
 
-static bool isPseudoliteral(const std::string& literal) //je verifie si not a numbre || infini
+static bool isPseudoliteral(const std::string& literal) //je verifie si not a number || infini
 {
     if(literal == "nan" || literal == "-inf" || literal == "+inf" ||
         literal == "nanf" || literal == "-inff" || literal == "+inff")
@@ -41,7 +41,7 @@ static bool isInt(const std::string &literal)
         return false; 
     for(; i < literal.size(); i++) //ici on gere tous les chiffres
     {
-        if(!std::isdigit(static_cast<unsigned char>(literal[i]))) //
+        if(!std::isdigit(static_cast<unsigned char>(literal[i]))) //int (valeur entre 0 et 255 ou EOF) et char peut etre signe ou non signe donc comportement indefini
             return false;
     }
     return true;
@@ -106,12 +106,12 @@ static bool isDouble(const std::string &literal)
     return true;
 } 
 
-static void printChar(char value)
+static void printChar(char c)
 {
-    if(!std::isprint(static_cast<unsigned char>(value)))
+    if(!std::isprint(static_cast<unsigned char>(c)))
         std::cout << "char: Non displayable" << std::endl;
     else
-        std::cout << "char: '" << value << "'" << std::endl;    
+        std::cout << "char: '" << c << "'" << std::endl;    
 }
 
 static void printInt(int value)
@@ -158,10 +158,11 @@ static void printDouble(double value)
         return;
     }
     
-    if(value == static_cast<int>(value))
-        std::cout << "double: " << std::fixed << std::setprecision(1) << value << std::endl;  
+    if(value == static_cast<int>(value))//on caste en int pour :enlever la partie décimale et comparer avec la valeur originale
+        std::cout << "double: " << std::fixed << std::setprecision(1) << value << std::endl; //42 → 42.0
+
     else
-        std::cout << "double: " << value << std::endl;
+        std::cout << "double: " << value << std::endl; //42.5 → 42.5
 }
 
 void ScalarConverter::convert(const std::string& literal)
@@ -183,8 +184,7 @@ void ScalarConverter::convert(const std::string& literal)
     {
         long l = std::strtol(literal.c_str(), NULL, 10);// pour gere les limites
 
-        if(l > std::numeric_limits<int>::max() || l < std::numeric_limits<int>::min())
-        
+        if(l > std::numeric_limits<int>::max() || l < std::numeric_limits<int>::min())// pour savoir si on peux convertir en int
         {
             std::cout << "char: impossible" << std::endl;
             std::cout << "int: impossible" << std::endl;
@@ -194,7 +194,7 @@ void ScalarConverter::convert(const std::string& literal)
         } 
 
         int i = static_cast<int>(l);
-        if(i < 0 || i > 127)
+        if(i < 0 || i > 127) // on voit si un int peut etre converti en char 
             std::cout << "char: impossible" << std::endl;
         else
             printChar(static_cast<char>(i));
